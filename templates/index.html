@@ -1,0 +1,85 @@
+$def with (estudiantes, cantidad, siguiente)
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Sistema de Atención - Escolares</title>
+</head>
+<body style="font-family: Arial, sans-serif; padding: 20px;">
+
+    <h1>Ventanilla de Servicios Escolares</h1>
+
+    <!-- f) Avisar si la fila está vacía -->
+    $if cantidad == 0:
+        <div style="background-color: #ffcccc; border: 1px solid red; padding: 10px; margin-bottom: 20px;">
+            <p style="color: red; font-weight: bold; margin: 0;">Alerta: La fila está vacía. No hay estudiantes esperando atención.</p>
+        </div>
+    $else:
+        <!-- e) Determinar cuántos estudiantes están esperando -->
+        <p><strong>Estudiantes en espera:</strong> $cantidad</p>
+        
+        <!-- c) Consultar quién es el siguiente -->
+        <div style="background-color: #e6f2ff; border: 1px solid #b3d9ff; padding: 15px; margin-bottom: 20px;">
+            <h3 style="margin-top: 0;">Siguiente en ser atendido:</h3>
+            <p>
+                <strong>Matrícula:</strong> $siguiente['matricula'] <br>
+                <strong>Nombre:</strong> $siguiente['nombre'] <br>
+                <strong>Trámite:</strong> $siguiente['tramite']
+            </p>
+            
+            <!-- b) Botón para atender (saca al estudiante de la fila) -->
+            <form action="/atender" method="POST">
+                <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px; border: none; cursor: pointer;">
+                    Atender a $siguiente['nombre']
+                </button>
+            </form>
+        </div>
+
+    <hr>
+
+    <!-- a) Formulario para agregar a la fila -->
+    <h3>Agregar nuevo estudiante a la fila</h3>
+    <form action="/agregar" method="POST" style="margin-bottom: 20px;">
+        <label>Matrícula:</label><br>
+        <input type="text" name="matricula" required><br><br>
+        
+        <label>Nombre(s):</label><br>
+        <input type="text" name="nombre" required><br><br>
+
+        <label>Apellidos:</label><br>
+        <input type="text" name="nombre" required><br><br>
+        
+        <label>Carrera:</label><br>
+        <input type="text" name="carrera" required><br><br>
+        
+        <label>Trámite a realizar:</label><br>
+        <input type="text" name="tramite" required><br><br>
+        
+        <button type="submit" style="padding: 5px 15px;">Formarse en la fila</button>
+    </form>
+
+    <hr>
+
+    <!-- d) Mostrar todos los estudiantes que esperan -->
+    <h3>Historial de la Fila Actual:</h3>
+    $if cantidad > 0:
+        <table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%; max-width: 800px;">
+            <tr style="background-color: #f2f2f2;">
+                <th>Turno (ID)</th>
+                <th>Matrícula</th>
+                <th>Nombre</th>
+                <th>Carrera</th>
+                <th>Trámite</th>
+            </tr>
+            $for est in estudiantes:
+                <tr>
+                    <td>$est['id']</td>
+                    <td>$est['matricula']</td>
+                    <td>$est['nombre']</td>
+                    <td>$est['carrera']</td>
+                    <td>$est['tramite']</td>
+                </tr>
+        </table>
+</body>
+</html>
