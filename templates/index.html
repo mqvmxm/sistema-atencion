@@ -1,76 +1,78 @@
-$def with (estudiantes, cantidad, siguiente)
+$def with (estudiantes, cantidad, siguientes)
 
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Sistema de Atención - Escolares</title>
+    <title>Sistema de Atención</title>
 </head>
-<body style="font-family: Arial, sans-serif; padding: 20px;">
+<body>
 
-    <h1>Ventanilla de Servicios Escolares</h1>
+    <h1>Sistema de Atención - Alumnos</h1>
 
-    <!-- f) Avisar si la fila está vacía -->
     $if cantidad == 0:
-        <div style="background-color: #ffcccc; border: 1px solid red; padding: 10px; margin-bottom: 20px;">
-            <p style="color: red; font-weight: bold; margin: 0;">Alerta: La fila está vacía. No hay estudiantes esperando atención.</p>
+        <div>
+            <p>Alerta: La fila está vacía. No hay estudiantes esperando atención.</p>
         </div>
     $else:
-        <!-- e) Determinar cuántos estudiantes están esperando -->
         <p><strong>Estudiantes en espera:</strong> $cantidad</p>
         
-        <!-- c) Consultar quién es el siguiente -->
-        <div style="background-color: #e6f2ff; border: 1px solid #b3d9ff; padding: 15px; margin-bottom: 20px;">
-            <h3 style="margin-top: 0;">Siguiente en ser atendido:</h3>
-            <p>
-                <strong>Matrícula:</strong> $siguiente['matricula'] <br>
-                <strong>Nombre:</strong> $siguiente['nombre'] <br>
-                <strong>Trámite:</strong> $siguiente['tramite']
-            </p>
+        <div>
+            <h3>Próximos en ser atendidos:</h3>
+            <ol>
+            $for est in siguientes:
+                <li><strong>$est['nombre']</strong> (Trámite: $est['tramite'])</li>
+            </ol>
             
-            <!-- b) Botón para atender (saca al estudiante de la fila) -->
             <form action="/atender" method="POST">
-                <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px; border: none; cursor: pointer;">
-                    Atender a $siguiente['nombre']
-                </button>
+                <button type="submit">Atender a $siguientes[0]['nombre']</button>
             </form>
         </div>
 
     <hr>
 
-    <!-- a) Formulario para agregar a la fila -->
     <h3>Agregar nuevo estudiante a la fila</h3>
-    <form action="/agregar" method="POST" style="margin-bottom: 20px;">
+    <form action="/agregar" method="POST">
         <label>Matrícula:</label><br>
         <input type="text" name="matricula" required><br><br>
         
-        <label>Nombre(s):</label><br>
-        <input type="text" name="nombre" required><br><br>
-
-        <label>Apellidos:</label><br>
+        <label>Nombre:</label><br>
         <input type="text" name="nombre" required><br><br>
         
         <label>Carrera:</label><br>
         <input type="text" name="carrera" required><br><br>
         
         <label>Trámite a realizar:</label><br>
-        <input type="text" name="tramite" required><br><br>
+        <select name="tramite" onchange="document.getElementById('div_otro').style.display = (this.value === 'Otro') ? 'block' : 'none';" required>
+            <option value="">Seleccione una opción...</option>
+            <option value="Constancia de estudios">Constancia de estudios</option>
+            <option value="Kardex">Kardex</option>
+            <option value="Reinscripción">Reinscripción</option>
+            <option value="Baja">Baja</option>
+            <option value="Otro">Otro (Especificar)</option>
+        </select><br><br>
         
-        <button type="submit" style="padding: 5px 15px;">Formarse en la fila</button>
+        <!-- Conserva el display: none para que la función de ocultar/mostrar funcione -->
+        <div id="div_otro" style="display: none;">
+            <label>Especifique el trámite:</label><br>
+            <input type="text" name="otro_tramite" placeholder="Escriba el trámite"><br><br>
+        </div>
+        
+        <button type="submit">Formarse en la fila</button>
     </form>
 
     <hr>
 
-    <!-- d) Mostrar todos los estudiantes que esperan -->
     <h3>Historial de la Fila Actual:</h3>
     $if cantidad > 0:
-        <table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%; max-width: 800px;">
-            <tr style="background-color: #f2f2f2;">
+        <table border="1">
+            <tr>
                 <th>Turno (ID)</th>
                 <th>Matrícula</th>
                 <th>Nombre</th>
                 <th>Carrera</th>
                 <th>Trámite</th>
+                <th>Acción</th>
             </tr>
             $for est in estudiantes:
                 <tr>
@@ -79,6 +81,11 @@ $def with (estudiantes, cantidad, siguiente)
                     <td>$est['nombre']</td>
                     <td>$est['carrera']</td>
                     <td>$est['tramite']</td>
+                    <td>
+                        <form action="/quitar/$est['id']" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas quitar a $est['nombre'] de la fila?');">
+                            <button type="submit">Quitar</button>
+                        </form>
+                    </td>
                 </tr>
         </table>
 </body>
