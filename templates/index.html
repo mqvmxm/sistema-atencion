@@ -1,3 +1,8 @@
+$# Declaración de variables enviadas desde Python a la plantilla:
+$# - estudiantes: Lista completa de alumnos en la fila.
+$# - cantidad: Total de alumnos en espera (número).
+$# - siguientes: Lista de los próximos alumnos a atender.
+
 $def with (estudiantes, cantidad, siguientes)
 
 <!DOCTYPE html>
@@ -9,28 +14,30 @@ $def with (estudiantes, cantidad, siguientes)
 <body>
 
     <h1>Sistema de Atención - Alumnos</h1>
-
+$# Evaluamos si la fila está vacía mediante una condición en Python ($if)
     $if cantidad == 0:
         <div>
             <p>Alerta: La fila está vacía. No hay estudiantes esperando atención.</p>
         </div>
     $else:
+    $# Si hay estudiantes en espera, mostramos la cantidad total
         <p><strong>Estudiantes en espera:</strong> $cantidad</p>
         
         <div>
             <h3>Próximos en ser atendidos:</h3>
             <ol>
+                $# Bucle $for para recorrer únicamente la lista de los 'siguientes' a atender
             $for est in siguientes:
                 <li><strong>$est['nombre']</strong> (Trámite: $est['tramite'])</li>
             </ol>
-            
+            $# Formulario con botón POST para procesar al primer estudiante de la lista ($siguientes[0])
             <form action="/atender" method="POST">
                 <button type="submit">Atender a $siguientes[0]['nombre']</button>
             </form>
         </div>
 
     <hr>
-
+$# Formulario HTML para registrar un nuevo alumno en la base de datos
     <h3>Agregar nuevo estudiante a la fila</h3>
     <form action="/agregar" method="POST">
         <label>Matrícula:</label><br>
@@ -62,7 +69,7 @@ $def with (estudiantes, cantidad, siguientes)
     </form>
 
     <hr>
-
+$# Tabla dinámica que despliega todo el historial/registro de alumnos guardados
     <h3>Historial de la Fila Actual:</h3>
     $if cantidad > 0:
         <table border="1">
@@ -74,6 +81,7 @@ $def with (estudiantes, cantidad, siguientes)
                 <th>Trámite</th>
                 <th>Acción</th>
             </tr>
+            $# Iteración $for sobre la lista completa de 'estudiantes' enviada desde la base de datos
             $for est in estudiantes:
                 <tr>
                     <td>$est['id']</td>
@@ -82,6 +90,8 @@ $def with (estudiantes, cantidad, siguientes)
                     <td>$est['carrera']</td>
                     <td>$est['tramite']</td>
                     <td>
+                        $# Envía la orden POST con la ID del estudiante ($est['id']) para eliminarlo
+                        $# Contiene confirmación emergente en JS antes de procesar el envío
                         <form action="/quitar/$est['id']" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas quitar a $est['nombre'] de la fila?');">
                             <button type="submit">Quitar</button>
                         </form>
