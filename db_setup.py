@@ -23,4 +23,4 @@ conn.commit()
 # 5. Cerrar conexión: Libera la base de datos para evitar bloqueos de archivo.
 conn.close()
 # Confirmación en la consola del desarrollador
-print("Base de datos y tabla 'fila' creadas exitosamente.")
+print("Base de datos y tab la 'fila' creadas exitosamente.")
